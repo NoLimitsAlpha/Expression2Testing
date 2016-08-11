@@ -1,0 +1,53 @@
+@persist Waves:array Pau Wave stats:table Settings:array Spawns:array Weapons:table
+
+if (first()) {
+    if (!isSinglePlayer() & !owner():isAdmin()) {printColor(_HUD_PRINTCENTER, vec(255,0,0), "You must be on a singleplayer or an admin on multiplayer to run this [For Obvious Reasons]") selfDestruct()}
+    Pau = 0
+    runOnTick(1)
+    runOnChat(1, owner())
+    stats = table(
+      [0] = 0, --Kills
+      [1] = 0 --Damage Taken
+    )
+    Wave = 1
+    Settings = array(
+      [0] = "npc_zombie", --What NPC to spawn
+      [1] = array("fas2_ak47"), --What weapon(s) will be used
+      [2] = vec2(25, 250), -- the min and max spawning radius (doesn't matter if using predefined locations)
+      [3] = 1, --now this is a tricky one, this is going to determine what method of spawning location will be used
+      --1 (reccomended) == randomly within the given spawning radius... with this method you need put how many enemies are going to spawn each Wave in the Waves array
+      --2 == this is predfined locations you will need to put in array for each index in the Waves array with every location that will have a zombie spawn for each zombie.
+      --3 == you will put spawn points in the Spawns array and it will then evenly distribute the defined amount of zombies to each spawnpoint. You input the data for the Waves array as you would if you chose 1
+    )
+    if (Settings[3] != 1 & Settings[3] != 2 & Settings[3] != 3) {
+        error("invalid spawning method. Define the correct one on Line 15!")
+      }
+      
+     Waves = array(
+        10,
+        25,
+        50,
+        75,
+        100,
+        125,
+        150,
+        175,
+        200
+      )
+  }
+    
+if (chatClk() & lastSaid() == "/start") {
+          timer("wave 1", 10*tickInterval())
+          Weapons = owner():getWeapons()
+          owner():plyStripWeapons()
+          if (Settings[1]:count() > 1) {
+              for (X = 0, Settings[1]:count()-1) {
+                owner():plyGiveWeapon(Settings[1][X])
+                owner():plySetAmmo(Settings[1][X], 100)
+              }
+            } else {
+              owner():plyGiveWeapon(Settings[1][0])
+              owner():plySetAmmo(Settings[1][0], 100)
+            }
+          printColor(_HUD_PRINTCENTER, "Starting Zombie Survival!!! Wave 1 in 10 seconds!")
+      }
